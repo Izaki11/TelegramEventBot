@@ -1,5 +1,5 @@
-#TelegramEventBot
-##v1.0
+# TelegramEventBot
+## v1.0
 
 **A handy Telegram bot that records event dates, and can even send reminder texts**
 
