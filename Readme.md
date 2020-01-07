@@ -1,7 +1,10 @@
 #TelegramEventBot
-##v1.0
+##v2.0
 
 **A handy Telegram bot that records event dates, and can even send reminder texts**
+
+**New in v2.0:**
+* TelegramEventBot now manages a list of events, so multiple events can be set and managed
 
 TelegramEventBot is as easy to use as:  
 1. Set up a new bot via "BotFather" (instructions from Telegram's website: https://core.telegram.org/bots#3-how-do-i-create-a-bot)
@@ -10,7 +13,8 @@ TelegramEventBot is as easy to use as:
 4. Add your bot to the chat group and begin issuing commands  
 
 TelegramEventBot list of commands:
-* /newevent (DateTime) - Sets a new event date
-* /currentevent - Checks the currently set event date
-* /setreminder (DateTime) - Sets a new date to remind the group of an event date
+* /newevent "EventName"(DateTime) - Sets a new event date
+* /currentevents - Displays the list of events
+* /setreminder "EventName" (DateTime) - Sets a new date to remind the group of an event date
+* /deleteevent "EventName" - Deletes the event
 * /help - Lists all commands

@@ -8,17 +8,55 @@ using Telegram.Bot.Args;
 
 namespace TelegramEventBot
 {
+    class Event
+    {
+        public DateTime eventDate;
+        public string eventName;
+        public DateTime alarmDate;
+        public System.Timers.Timer eventAlarm;
+        public long chatToMessage;
+        public async void SetTimer(DateTime alarmDate, long groupToMessage)
+        {
+            if (alarmDate >= eventDate)
+            {
+                throw new ArgumentException("alarmDate cannot be past the event date");
+            }
+            else
+            {
+                this.alarmDate = alarmDate;
+                TimeSpan finalDate = alarmDate - DateTime.Now;
+                double finalDateConverted = finalDate.TotalMilliseconds;
+                eventAlarm = new System.Timers.Timer(finalDateConverted);
+                eventAlarm.Elapsed += OnAlarmEvent;
+                eventAlarm.Enabled = true;
+                chatToMessage = groupToMessage;
+            }
+        }
+        private async void OnAlarmEvent(object sender, ElapsedEventArgs e)
+        {
+            try
+            {
+                Console.WriteLine("Reminder for the event '" + eventName + "' was just sent at: " + DateTime.Now);
+                await BotMain.botClient.SendTextMessageAsync(chatId: chatToMessage, text: "This is a reminder for the event '" + eventName + "' at " + eventDate.ToString());
+                eventAlarm.Stop();
+                eventAlarm.Dispose();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Error sending reminder text message for event: " + eventName + " to chatId: " + chatToMessage);
+            }
+        }
+    }
     class BotMain
     {
-        private static readonly string botID = "Insert your botID here";
-        private static ITelegramBotClient botClient;
-        private static DateTime eventDate;
-        private static long chatToMessage;
-        private static System.Timers.Timer eventAlarm;
+        private static readonly string botID = "Insert your bot id here";
+        public static ITelegramBotClient botClient;
+        private static List<Event> eventList;
 
         public static void Init()
         {
             botClient = new TelegramBotClient(botID);
+            eventList = new List<Event>();
             var me = botClient.GetMeAsync().Result;
             Console.WriteLine("Hello World! Bot user: " + me.Id + "with name: " + me.Username + "has initialized!");
 
@@ -38,53 +76,88 @@ namespace TelegramEventBot
 
                     string eventText = ParseEventText(args);
 
-                    if(eventText != null)
+                    if (eventText != null)
                     {
                         try
                         {
-                            eventDate = DateTime.Parse(eventText);
-                            Console.WriteLine("Set new event date for: " + eventDate.ToString());
-                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Setting date for new event on: " + eventDate.ToString());
+                            Event newEvent = new Event();
+                            newEvent.eventName = args[1];
+                            newEvent.eventDate = DateTime.Parse(eventText);
+                            eventList.Add(newEvent);
+                            Console.WriteLine("New event '" + newEvent.eventName + "' date set for: " + newEvent.eventDate.ToString());
+                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, disableNotification: true, text: "Creating new event '" + newEvent.eventName + "' set on date: " + newEvent.eventDate.ToString());
                         }
                         catch (Exception)
                         {
-                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Date parsing error - acceptable format: mm/dd/yyyy 0:00:00 AM");
+                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, disableNotification: true, text: "Date parsing error - acceptable format: mm/dd/yyyy 0:00:00 AM");
                         }
+                    }
+                    else if (eventText == null)
+                    {
+                        await botClient.SendTextMessageAsync(chatId: e.Message.Chat, disableNotification: true, text: "Usage: '/newevent mm/dd/yyyy 0:00:00 AM'");
                     }
                     break;
 
-                case "/currentevent":
+                case "/currentevents":
 
-                    await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Current event date is set for: " + eventDate.ToString());
+                    await botClient.SendTextMessageAsync(chatId: e.Message.Chat, disableNotification: true, text: ListAllEvents());
                     break;
 
                 case "/setreminder":
 
-                    string reminderText = ParseEventText(args);
+                    eventText = ParseEventText(args);
 
-                    if (reminderText != null)
+                    if (eventText != null)
                     {
                         try
                         {
-                            SetTimer(DateTime.Parse(reminderText));
-                            chatToMessage = e.Message.Chat.Id;
-                            Console.WriteLine("Set new alarm for: " + reminderText);
-                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Setting alarm for event on: " + reminderText);
+                            string eventNameArg = args[1];
+                            ListSearch(eventNameArg).SetTimer(DateTime.Parse(eventText), e.Message.Chat.Id);
+                            Console.WriteLine("Set new alarm for: " + eventText);
+                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, disableNotification: true, text: "Setting alarm for event " + ListSearch(eventNameArg).eventName + " on: " + eventText);
+                        }
+                        catch (ArgumentException)
+                        {
+                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, disableNotification: true, text: "Reminder date cannot be set past the event date");
                         }
                         catch (Exception)
                         {
-                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Reminder date parsing error - acceptable format : mm/dd/yyyy 0:00:00 AM");
+                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat, disableNotification: true, text: "Reminder date parsing error - acceptable format : mm/dd/yyyy 0:00:00 AM");
                         }
+                    }
+                    break;
+
+                case "/deleteevent":
+
+                    if (args[1] != null)
+                    {
+                        Event eventToDelete = ListSearch(args[1]);
+
+                        if (eventList.Contains(eventToDelete))
+                        {
+                            string eventToDeleteName = eventToDelete.eventName;
+                            eventList.Remove(eventToDelete);
+                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat.Id, disableNotification: true, text: "Event '" + eventToDeleteName + "' was deleted");
+                        }
+                        else if (!eventList.Contains(eventToDelete))
+                        {
+                            await botClient.SendTextMessageAsync(chatId: e.Message.Chat.Id, disableNotification: true, text: "Event '" + args[1] + "' was not found");
+                        }
+                    }
+                    else if (args[1] == null)
+                    {
+                        await botClient.SendTextMessageAsync(chatId: e.Message.Chat.Id, disableNotification: true, text: "Usage: '/deleteevent EVENTNAME'");
                     }
                     break;
 
                 case "/help":
 
-                    await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: 
+                    await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text:
                         "Available options: \n " +
                         "/newevent - Sets a new event date (Format: mm/dd/yyyy 0:00:00 AM) \n " +
-                        "/currentevent - Checks the currently set event date \n" +
+                        "/currentevents - Displays the list of current events \n" +
                         "/setreminder - Sets a new date to remind the group of an event \n" +
+                        "/deleteevent - Removes an event from the list \n" +
                         "/help - Lists all commands");
                     break;
             }
@@ -95,7 +168,7 @@ namespace TelegramEventBot
         {
             string temp = null;
 
-            for (int i = 1; i < text.Length; i++)
+            for (int i = 2; i < text.Length; i++)
             {
                 temp += text[i] + " ";
             }
@@ -103,28 +176,29 @@ namespace TelegramEventBot
             return temp;
         }
 
-       private static async void SetTimer(DateTime alarmDate)
+        private static string ListAllEvents()
         {
-            if (alarmDate >= eventDate)
+            string listOfEvents = "";
+
+            if (eventList.Count == 0)
             {
-                return;
+                return "There are currently no events";
             }
             else
             {
-                TimeSpan finalDate = alarmDate - DateTime.Now;
-                double finalDateConverted = finalDate.TotalMilliseconds;
-                eventAlarm = new System.Timers.Timer(finalDateConverted);
-                eventAlarm.Elapsed += OnAlarmEvent;
-                eventAlarm.Enabled = true;
+                foreach (Event e in eventList)
+                {
+                    listOfEvents += e.eventName + " - " + e.eventDate.ToString() + "\n";
+                }
+
+                return listOfEvents;
             }
+
         }
 
-        private static async void OnAlarmEvent(object sender, ElapsedEventArgs e)
+        private static Event ListSearch(string s)
         {
-            Console.WriteLine("Reminder was just sent at: " + DateTime.Now);
-            await botClient.SendTextMessageAsync(chatId: chatToMessage, text: "This is a reminder for your event at " + eventDate.ToString());
-            eventAlarm.Stop();
-            eventAlarm.Dispose();
+            return eventList.Find(x => x.eventName == s);
         }
     }
 }
