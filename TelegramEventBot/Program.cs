@@ -6,17 +6,31 @@ namespace TelegramEventBot
     {
         static void Main()
         {
-            Console.WriteLine("Please enter chat id: \n");
-            long id;
-            try
+            while (true)
             {
-                id = Convert.ToInt64(Console.ReadLine());
+                Console.WriteLine("Please enter bot id: ");
+                string botId = Console.ReadLine();
+                Console.WriteLine("Please enter chat id (typing '/pingid' to bot will fetch chat id): \n");
+                long id;
+                try
+                {
+                    id = Convert.ToInt64(Console.ReadLine());
+                }
+                catch (Exception)
+                {
+                    id = 0;
+                }
+
+                try
+                {
+                    BotMain.Init(botId, id);
+                    continue;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
-            catch (Exception)
-            {
-                id = 0;
-            }
-            BotMain.Init(id);
         }
     }
 }

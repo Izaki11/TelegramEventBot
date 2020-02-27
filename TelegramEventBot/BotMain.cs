@@ -49,17 +49,19 @@ namespace TelegramEventBot
     }
     class BotMain
     {
-        private static readonly string botID = "Insert your bot id here";
+        private static string botID;
         private static long privateId;
         public static ITelegramBotClient botClient;
         private static List<Event> eventList;
 
-        public static void Init(long id)
+        public static void Init(string botId, long id)
         {
+            botID = botId;
             botClient = new TelegramBotClient(botID);
             eventList = new List<Event>();
             privateId = id;
             var me = botClient.GetMeAsync().Result;
+            Console.Clear();
             Console.WriteLine("Hello World! Bot user: " + me.Id + " with name: " + me.Username + " has initialized!");
 
             botClient.OnMessage += Bot_OnMessage;
