@@ -1,0 +1,25 @@
+﻿<Window x:Class="TelegramEventBot_AdminPanel.EventDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TelegramEventBot_AdminPanel"
+        mc:Ignorable="d"
+        Title="New Event" Height="220" Width="320"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="10">
+        <TextBlock Text="Event Name" />
+        <TextBox x:Name="EventNameTextBox" />
+        <TextBlock Text="Event Date" Margin="0 10 0 0" />
+        <DatePicker x:Name="EventDateTextBox" CalendarOpened="EventDateTextBox_CalendarOpened" />
+        <TextBlock Text="Event Time" Margin="0 10 0 0" />
+        <TextBox x:Name="EventTimeTextBox" />
+
+        <StackPanel Orientation="Horizontal" Margin="0 10" HorizontalAlignment="Center">
+            <Button x:Name="OkButton" Click="OkButton_Click" IsDefault="True" Content="Ok" Width="60" Margin="5 0" />
+            <Button x:Name="CancelButton" Click="CancelButton_Click" IsCancel="True" Content="Cancel" Width="60" Margin="5 0" />
+        </StackPanel>
+    </StackPanel>
+</Window>

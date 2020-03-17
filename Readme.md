@@ -1,23 +1,16 @@
 # TelegramEventBot
-## v2.1
+## v3.0
 
-**A handy Telegram bot that records event dates, and can even send reminder texts**
-*Due to the simplicity of this bot and the nature of Telegram's bot system, the use of a private chat id is highly encouraged*
+**A handy Telegram bot manager that records event dates, and can even send reminder texts**
 
-**New in v2.1:**
-* TelegramEventBot now supports a private chat id, for adhering to a single group or private chat
+**New in v3.0:**
+* TelegramEventBot has been completely rebuilt with WPF-based user interface for a more powerful and user-friendly experience.
 
 TelegramEventBot is as easy to use as:  
 1. Set up a new bot via "BotFather" (instructions from Telegram's website: https://core.telegram.org/bots#3-how-do-i-create-a-bot)
-2. Build and run the application
+2. Build/run the application
 3. Enter the ID of the bot to command
-4. Enter the desired chat id into the console
-5. Add your bot to the chat group and begin issuing commands  
+4. Add desired chat groups into the list, and set up events as desired
 
-TelegramEventBot list of commands:
-* /newevent "EventName" (DateTime) - Sets a new event date
-* /currentevents - Displays the list of events
-* /setreminder "EventName" (DateTime) - Sets a new date to remind the group of an event date
-* /deleteevent "EventName" - Deletes the event
-* /pingid - Requests the host console to display your current chat's id
-* /help - Lists all commands
+**Dependencies**
+Telegram.Bot - .NET Client for Telegram Bot API (https://github.com/TelegramBots/Telegram.Bot)

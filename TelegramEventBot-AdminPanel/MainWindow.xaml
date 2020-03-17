@@ -1,0 +1,143 @@
+﻿<Window x:Class="TelegramEventBot_AdminPanel.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TelegramEventBot_AdminPanel"
+        mc:Ignorable="d"
+        Title="TelegramEventBot" Height="650" Width="900">
+    <DockPanel Margin="5">
+
+        <!-- Bot ID display -->
+        <Grid DockPanel.Dock="Top" Margin="0 0 0 5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Text="ID:" FontWeight="Bold" />
+            <TextBox x:Name="BotIdTextBox" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="5 0 0 0" IsReadOnly="False" />
+            <Button x:Name="InitButton" Click="InitButton_Click" Grid.Column="2" Margin="5 0 0 0" Content="Initialize" />
+            <Button x:Name="ShutdownButton" Click="ShutdownButton_Click" Grid.Column="3" Margin="5 0 0 0" Content="Shutdown" />
+        </Grid>
+
+        <!-- Control panel -->
+        <Border x:Name="ControlPanelParent" DockPanel.Dock="Bottom" MinHeight="300" BorderThickness="1" BorderBrush="DarkGray" Margin="0 5 0 0" Padding="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Chat List -->
+                <DockPanel Grid.Column="0">
+
+                    <TextBlock DockPanel.Dock="Top" Text="Chat List" />
+
+                    <Grid DockPanel.Dock="Bottom" Margin="0 5 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button x:Name="ChatAddButton" Click="ChatAddButton_Click" Grid.Column="0" Content="Add" Margin="0 0 2.5 0" />
+                        <Button x:Name="ChatRemoveButton" Click="ChatRemoveButton_Click" Grid.Column="1" Content="Remove" Margin="2.5 0 0 0" />
+                    </Grid>
+                    <ListBox x:Name="ChatListBox" SelectionChanged="ChatListBox_SelectionChanged" >
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding chatName}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+
+                <!-- Info -->
+                <DockPanel Grid.Column="1" Margin="20 0 0 0">
+
+                    <TextBlock DockPanel.Dock="Top" Text="Info" />
+
+                    <Border x:Name="InfoPanelParent" BorderThickness="1" BorderBrush="DarkGray">
+
+                        <Grid Margin="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Column="0" Grid.Row="0" Text="Chat Name" VerticalAlignment="Bottom" />
+                            <TextBlock Grid.Column="2" Grid.Row="0" Text="Chat ID" VerticalAlignment="Bottom" />
+
+                            <TextBox x:Name="ChatNameTextBox" Grid.Column="0" Grid.Row="1" Background="LightGray" VerticalAlignment="Top" />
+                            <TextBox x:Name="ChatIdTextBox" Grid.Column="2" Grid.Row="1" Background="LightGray" VerticalAlignment="Top" />
+
+                            <TextBlock Grid.Column="0" Grid.Row="2" Text="Events" VerticalAlignment="Bottom" />
+                            <ListBox x:Name="EventListBox" SelectionChanged="EventListBox_SelectionChanged" Grid.Column="0" Grid.Row="3" Grid.RowSpan="6" VerticalAlignment="Stretch" >
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding eventName}" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <Grid Grid.Column="0" Grid.Row="9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="AddEventButton" Click="AddEventButton_Click" Grid.Column="0" Content="Add" Margin="0 5 5 0" />
+                                <Button x:Name="RemoveEventButton" Click="RemoveEventButton_Click" Grid.Column="1" Content="Remove" Margin="5 5 0 0" />
+
+                            </Grid>
+
+                            <TextBlock Grid.Column="2" Grid.Row="3" Text="Event Name" VerticalAlignment="Bottom" />
+                            <TextBox x:Name="EventNameTextBox" Grid.Column="2" Grid.Row="4" VerticalAlignment="Top" />
+
+                            <TextBlock Grid.Column="2" Grid.Row="5" Text="Event Date" VerticalAlignment="Bottom" />
+                            <TextBox x:Name="EventDateTextBox" Grid.Column="2" Grid.Row="6" VerticalAlignment="Top" />
+
+                            <TextBlock Grid.Column="2" Grid.Row="7" Text="Event Alarm" VerticalAlignment="Bottom" />
+                            <TextBox x:Name="EventAlarmTextBox" Grid.Column="2" Grid.Row="8" VerticalAlignment="Top" />
+
+                            <Grid Grid.Column="2" Grid.Row="9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="SetAlarmButton" Grid.Column="0" Margin="0 5 5 0" Content="Set Alarm" Click="SetAlarmButton_Click" />
+                                <Button x:Name="RemoveAlarmButton" Grid.Column="1" Margin="5 5 0 0" Content="Remove Alarm" Click="RemoveAlarmButton_Click" />
+                            </Grid>
+
+                        </Grid>
+
+                    </Border>
+
+                </DockPanel>
+
+            </Grid>
+        </Border>
+
+        <!-- Message console -->
+        <ScrollViewer x:Name="ConsoleScrollViewer" ScrollChanged="ConsoleScrollViewer_ScrollChanged">
+            <TextBox DockPanel.Dock="Top" x:Name="ConsoleOutputTextBox" TextWrapping="Wrap" MinHeight="200" Background="Black" Foreground="White" />
+        </ScrollViewer>
+
+    </DockPanel>
+</Window>
